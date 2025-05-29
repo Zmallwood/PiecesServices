@@ -1,6 +1,12 @@
 # PiecesServices
 
-to host frontend:
+Due to how opentofu/microk8s works, need to serve the services in the NodePort range (30000+)
+
+alternative way to host frontend:
+change from NodePort to LoadBalancer
+add below LoadBalancer:
+load_balancer_ip = "192.168.1.243"
+
 microk8s enable metallb
 enter ip range: 192.168.1.240-192.168.1.250
 

@@ -9,6 +9,7 @@ COPY package*.json ./
 
 # Install dependencies
 RUN npm install --production
+RUN npm install -g nodemon
 
 # Copy the rest of the application source code
 COPY . .
@@ -17,5 +18,6 @@ COPY . .
 EXPOSE 3000
 
 # Define the command to run the app
-CMD ["node", "src/app.js"]
+#CMD ["node", "src/app.js"]
+CMD ["nodemon", "--exec", "ts-node", "src/index.ts"]
 

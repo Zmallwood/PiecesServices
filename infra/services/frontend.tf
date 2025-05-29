@@ -45,8 +45,9 @@ resource "kubernetes_service" "pieces-frontend_service" {
     port {
       port        = 80
       target_port = 80
+      node_port   = 32000  # Must be within NodePort range (30000-32767)
     }
-    type = "LoadBalancer"  # Or "LoadBalancer" depending on your setup
-    load_balancer_ip = "192.168.1.243"
+    type = "NodePort"  # Or "LoadBalancer" depending on your setup
+    #load_balancer_ip = "192.168.1.243"
   }
 }
