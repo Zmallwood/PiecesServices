@@ -4,22 +4,22 @@ import cors from 'cors';
 const app = express();
 const port = 3000;
 
-// Enable CORS for all origins
 app.use(cors());
+//app.use(cors({ origin: 'http://localhost:30000' }));
 
-app.get("/", (req: Request, res: Response) => {
-  //res.send("Hello from TypeScript backend!");
+app.get("/", async (req: Request, res: Response) => {
+  try {
+    const response = await fetch('http://pieces-game-renderer-service:3001/rendered_game');
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching data' });
+  }
   //const data = {
-  //  commands: ["Clear;0;150;255;"]
+  //  commands: ["DrawImage;DefaultSceneBackground;0.0;0.0;1.0;1.0;false;"]
   //};
 
-  const data = {
-    commands: ["DrawImage;DefaultSceneBackground;0.0;0.0;1.0;1.0;false;"]
-  };
-
-  res.json(data); // Respond with JSON
-//  res.send({\"commands\": "
-//              "[\"DrawImage;GroundGrass;0.0;0.0;0.2;0.2;false;\"]})
+  //res.json(data);
 });
 
 app.listen(port, () => {
