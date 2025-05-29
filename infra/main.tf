@@ -18,5 +18,5 @@ provider "helm" {
 }
 
 module "services_submodule" {
-  source = "./services"
+  source = "./pieces"
 }
