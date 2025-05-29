@@ -55,7 +55,7 @@ resource "kubernetes_service" "pieces-postgres_service" {
     port {
       port        = 5432
       target_port = 5432
-      node_port = 31111
+      node_port   = 31111
     }
     #type = "ClusterIP"
     type = "NodePort"
