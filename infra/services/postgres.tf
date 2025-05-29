@@ -22,7 +22,7 @@ resource "kubernetes_deployment" "pieces-postgres" {
       spec {
         container {
           name  = "postgres"
-          image = "public.ecr.aws/bitnami/postgresql:latest"
+          image = "public.ecr.aws/bitnami/postgresql:17.5.0-debian-12-r6"
 
           env {
             name  = "POSTGRESQL_PASSWORD"

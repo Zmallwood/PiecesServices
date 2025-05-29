@@ -20,3 +20,4 @@ Then frontend can be accessed at http://pieces.local:80
 
 Note:
 redir :9092 192.168.1.244:9092
+redir resets on closing the program

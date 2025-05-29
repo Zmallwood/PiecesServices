@@ -22,7 +22,7 @@ resource "kubernetes_deployment" "pieces-kafka" {
       spec {
         container {
           name  = "kafka"
-          image = "public.ecr.aws/bitnami/kafka:latest"
+          image = "public.ecr.aws/bitnami/kafka:4.0.0-debian-12-r5"
 
           env {
             name  = "KAFKA_CFG_NODE_ID"
