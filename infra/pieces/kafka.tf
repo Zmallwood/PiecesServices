@@ -1,102 +1,45 @@
-resource "kubernetes_deployment" "pieces-kafka" {
-  metadata {
-    name = "pieces-kafka"
-  }
+resource "helm_release" "pieces_kafka" {
+  name       = "pieces-kafka"
+  #repository = "https://charts.bitnami.com/bitnami"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
+  chart      = "kafka"
+  version    = "32.2.10"  # choose a stable version
+  repository_username = var.docker_username
+  repository_password = var.docker_password
 
-  spec {
-    replicas = 1
-
-    selector {
-      match_labels = {
-        app = "pieces-kafka"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "pieces-kafka"
-        }
+  values = [
+    yamlencode({
+      image = {
+        pullSecrets = ["auth-docker"]
       }
 
-      spec {
-        container {
-          name  = "kafka"
-          image = "public.ecr.aws/bitnami/kafka:4.0.0-debian-12-r5"
+      replicaCount = 1
 
-          env {
-            name  = "KAFKA_CFG_NODE_ID"
-            value = "1"
-          }
-
-          env {
-            name  = "KAFKA_CFG_PROCESS_ROLES"
-            value = "broker,controller"
-          }
-
-          env {
-            name  = "KAFKA_CFG_CONTROLLER_LISTENER_NAMES"
-            value = "CONTROLLER"
-          }
-
-          env {
-            name  = "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP"
-            value = "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
-          }
-
-          env {
-            name  = "KAFKA_CFG_LISTENERS"
-            value = "PLAINTEXT://:9092,CONTROLLER://:9093"
-          }
-
-          env {
-            name  = "KAFKA_CFG_ADVERTISED_LISTENERS"
-            #value = "PLAINTEXT://192.168.1.244:9092"
-            value = "PLAINTEXT://localhost:9092"
-            #value = "PLAINTEXT://192.168.1.140:9092"
-          }
-
-          env {
-            name  = "ALLOW_PLAINTEXT_LISTENER"
-            value = "yes"
-          }
-
-          env {
-            name  = "KAFKA_CFG_CONTROLLER_QUORUM_VOTERS"
-            value = "1@localhost:9093"
-          }
-
-          port {
-            container_port = 9092
-          }
-
-          port {
-            container_port = 9093
-          }
-        }
+      service = {
+        type            = "LoadBalancer"
+        loadBalancerIP  = "192.168.1.244"  # optional: your LB IP
+        port            = 9092
+        nodePorts       = { client = 32222 } # if you want nodeport as well
       }
-    }
-  }
-}
 
-resource "kubernetes_service" "pieces-kafka_service" {
-  metadata {
-    name = "pieces-kafka-service"
-  }
+      # Allow plaintext listener (for testing/dev)
+      allowPlaintextListener = true
 
-  spec {
-    selector = {
-      app = kubernetes_deployment.pieces-kafka.spec[0].template[0].metadata[0].labels.app
-    }
-    port {
-      port        = 9092
-      target_port = 9092
-      #node_port   = 32222
-    }
-    #type = "ClusterIP"
-    #type = "NodePort"
-    type = "LoadBalancer"
-    load_balancer_ip = "192.168.1.244"
-  }
+      # Configure listeners & advertised listeners
+      kafkaListeners = "PLAINTEXT://:9092,CONTROLLER://:9093"
+      kafkaAdvertisedListeners = "PLAINTEXT://localhost:9092"
+      kafkaListenerSecurityProtocolMap = "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      kafkaProcessRoles = "broker,controller"
+      kafkaControllerListenerNames = "CONTROLLER"
+      kafkaControllerQuorumVoters = "1@localhost:9093"
+      kafkaNodeId = 1
+
+      persistence = {
+        enabled = true
+        size    = "8Gi"
+        # storageClass = "standard"
+      }
+    })
+  ]
 }
 

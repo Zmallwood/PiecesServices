@@ -5,9 +5,15 @@ resource "helm_release" "pieces-postgres" {
   #chart     = "bitnami/postgresql"
   chart      = "postgresql"
   version    = "16.5.0"
+  repository_username = var.docker_username
+  repository_password = var.docker_password
 
   values = [
     yamlencode({
+      image = {
+        pullSecrets = ["auth-docker"]
+      }
+
       global = {
         postgresql = {
           #postgresqlPassword = "mysecretpassword"

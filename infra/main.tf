@@ -19,4 +19,8 @@ provider "helm" {
 
 module "services_submodule" {
   source = "./pieces"
+
+  docker_username = var.docker_username
+  docker_password = var.docker_password
+  docker_email    = var.docker_email
 }
